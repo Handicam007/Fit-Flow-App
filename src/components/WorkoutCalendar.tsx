@@ -49,19 +49,19 @@ const WorkoutCalendar = () => {
         onSelect={(date) => date && setSelectedDate(date)}
         className="rounded-md"
         components={{
-          Day: ({ date, ...dayProps }) => {
+          Day: ({ day, ...dayProps }) => {
             return (
               <div
                 {...dayProps}
                 className={cn(
                   dayProps.className,
                   "relative h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-                  getWorkoutForDate(date) && "font-semibold",
-                  getWorkoutForDate(date)?.completed && "bg-muted/50"
+                  getWorkoutForDate(day) && "font-semibold",
+                  getWorkoutForDate(day)?.completed && "bg-muted/50"
                 )}
               >
                 <div className="flex h-full w-full flex-col items-center justify-center">
-                  {renderDay(date)}
+                  {renderDay(day)}
                 </div>
               </div>
             );
