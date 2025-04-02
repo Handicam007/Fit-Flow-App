@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Fitness app specific colors
+				strength: {
+					DEFAULT: '#4C51BF', // indigo
+					light: '#C3DAFE',
+				},
+				mobility: {
+					DEFAULT: '#48BB78', // green
+					light: '#C6F6D5',
+				},
+				running: {
+					DEFAULT: '#ED8936', // orange
+					light: '#FEEBC8',
 				}
 			},
 			borderRadius: {
@@ -84,11 +98,19 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-slow': {
+					'0%, 100%': { opacity: '1' },
+					'50%': { opacity: '0.8' },
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-slow': 'pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+			},
+			backgroundImage: {
+				'gradient-fitness': 'linear-gradient(to right, #4C51BF, #48BB78)',
 			}
 		}
 	},
