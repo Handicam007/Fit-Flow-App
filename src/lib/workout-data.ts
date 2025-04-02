@@ -1,6 +1,6 @@
 
 import { format, addDays, startOfWeek } from "date-fns";
-import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession } from "@/types/workout";
+import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession, WorkoutType } from "@/types/workout";
 
 // Initial workout plan with 4 weeks of data
 export const generateInitialWorkouts = (): WorkoutEntry[] => {
@@ -10,13 +10,13 @@ export const generateInitialWorkouts = (): WorkoutEntry[] => {
 
   // Weekly workout plan
   const weeklyPlan = [
-    { day: "Monday", title: "Bouldering + Mobility & Core", type: "Mobility" },
-    { day: "Tuesday", title: "Full Body Strength (Push Focus)", type: "Strength" },
-    { day: "Wednesday", title: "Zone 2 Run + Mobility & Core", type: "Running" },
-    { day: "Thursday", title: "Soccer", type: "Running" },
-    { day: "Friday", title: "Full Body Strength (Pull Focus)", type: "Strength" },
+    { day: "Monday", title: "Bouldering + Mobility & Core", type: "Mobility" as WorkoutType },
+    { day: "Tuesday", title: "Full Body Strength (Push Focus)", type: "Strength" as WorkoutType },
+    { day: "Wednesday", title: "Zone 2 Run + Mobility & Core", type: "Running" as WorkoutType },
+    { day: "Thursday", title: "Soccer", type: "Running" as WorkoutType },
+    { day: "Friday", title: "Full Body Strength (Pull Focus)", type: "Strength" as WorkoutType },
     { day: "Saturday", title: "Bouldering OR Long Run", type: alternateWeeks },
-    { day: "Sunday", title: "Active Recovery + Mobility", type: "Mobility" },
+    { day: "Sunday", title: "Active Recovery + Mobility", type: "Mobility" as WorkoutType },
   ];
 
   // Generate 4 weeks of workouts
@@ -41,7 +41,7 @@ export const generateInitialWorkouts = (): WorkoutEntry[] => {
 };
 
 // Helper to alternate between Mobility and Running for Saturdays
-function alternateWeeks(week: number): "Mobility" | "Running" {
+function alternateWeeks(week: number): WorkoutType {
   return week % 2 === 0 ? "Mobility" : "Running";
 }
 
