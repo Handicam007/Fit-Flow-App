@@ -1,6 +1,6 @@
 
 import { format, addDays, startOfWeek } from "date-fns";
-import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession, WorkoutType } from "@/types/workout";
+import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession, WorkoutType, WorkoutPreset } from "@/types/workout";
 
 // Initial workout plan with 4 weeks of data
 export const generateInitialWorkouts = (): WorkoutEntry[] => {
@@ -81,4 +81,105 @@ export const defaultMobilityExercises: MobilityExercise[] = [
 export const defaultRunningSessions: RunningSession[] = [
   { type: "Zone 2 Run", duration: "30-40", notes: "Keep HR 60-70% of max; conversational pace" },
   { type: "Long Run", distance: "5 (start)", notes: "Increase distance by 1 km weekly" }
+];
+
+// Default workout presets
+export const defaultWorkoutPresets: WorkoutPreset[] = [
+  // Strength presets
+  {
+    id: "preset-strength-push",
+    name: "Full Body (Push Focus)",
+    type: "Strength" as WorkoutType,
+    description: "Full body workout with emphasis on pushing movements",
+    exercises: [
+      { exercise: "Squat (Front/Back)", sets: "4", reps: "6-8", notes: "Focus on form" },
+      { exercise: "Dumbbell Bench Press", sets: "3", reps: "8-10", notes: "Full range of motion" },
+      { exercise: "Bulgarian Split Squat", sets: "3", reps: "10 each leg", notes: "Keep core engaged" },
+      { exercise: "Overhead DB Press", sets: "3", reps: "10", notes: "Controlled movement" },
+      { exercise: "Hanging Leg Raises", sets: "3", reps: "10", notes: "Engage core" },
+    ]
+  },
+  {
+    id: "preset-strength-pull",
+    name: "Full Body (Pull Focus)",
+    type: "Strength" as WorkoutType,
+    description: "Full body workout with emphasis on pulling movements",
+    exercises: [
+      { exercise: "Trap Bar Deadlift", sets: "4", reps: "6", notes: "Maintain neutral spine" },
+      { exercise: "Pull-Ups / Lat Pulldown", sets: "4", reps: "8-10", notes: "Full range, controlled" },
+      { exercise: "Barbell Row", sets: "3", reps: "10", notes: "Keep back flat" },
+      { exercise: "Hip Thrust / KB Swing", sets: "3", reps: "12", notes: "Focus on glutes" },
+      { exercise: "Dead Bugs", sets: "3", reps: "10", notes: "Core stabilization" },
+    ]
+  },
+  {
+    id: "preset-strength-core",
+    name: "Core & Mobility Circuit",
+    type: "Strength" as WorkoutType,
+    description: "Core strengthening with mobility work",
+    exercises: [
+      { exercise: "Plank", sets: "3", reps: "45 seconds", notes: "Keep body straight" },
+      { exercise: "Side Plank", sets: "3", reps: "30 seconds each side", notes: "Stack shoulders" },
+      { exercise: "Bird Dog", sets: "3", reps: "10 each side", notes: "Maintain stability" },
+      { exercise: "Dead Bug", sets: "3", reps: "10 each side", notes: "Press lower back to floor" },
+      { exercise: "Glute Bridge", sets: "3", reps: "15", notes: "Squeeze at top" },
+    ]
+  },
+  
+  // Mobility presets
+  {
+    id: "preset-mobility-full",
+    name: "Full Body Mobility",
+    type: "Mobility" as WorkoutType,
+    description: "Comprehensive mobility routine for all major joints",
+    exercises: [
+      { exercise: "World's Greatest Stretch", reps: "2 reps each side", notes: "Dynamic hip opener" },
+      { exercise: "Hip 90/90 Rotations", reps: "10 reps", notes: "Rotate hips fully" },
+      { exercise: "Couch Stretch", duration: "0.5 per side", reps: "2 sets", notes: "Hold for 30 sec each side" },
+      { exercise: "Cat-Cow & Downward Dog", duration: "1", reps: "Continuous", notes: "Flow smoothly" },
+      { exercise: "Thoracic Spine Rotations", reps: "10 each side", notes: "Rotate from upper back" },
+    ]
+  },
+  {
+    id: "preset-mobility-lower",
+    name: "Lower Body Mobility",
+    type: "Mobility" as WorkoutType,
+    description: "Focus on hip, knee, and ankle mobility",
+    exercises: [
+      { exercise: "Hip CAR's", reps: "5 each direction", notes: "Controlled movement" },
+      { exercise: "Hip 90/90 Stretch", reps: "30 sec each side", notes: "Sit tall" },
+      { exercise: "Couch Stretch", reps: "45 sec each side", notes: "Quad and hip flexor" },
+      { exercise: "Ankle Mobility", reps: "10 each side", notes: "Push knee past toes" },
+      { exercise: "Pigeon Pose", reps: "60 sec each side", notes: "Breathe into stretch" },
+    ]
+  },
+  
+  // Running presets
+  {
+    id: "preset-running-zone2",
+    name: "Zone 2 Run",
+    type: "Running" as WorkoutType,
+    description: "Aerobic base building run at conversational pace",
+    exercises: [
+      { type: "Zone 2 Run", duration: "30-40", notes: "Keep HR 60-70% of max; conversational pace" }
+    ]
+  },
+  {
+    id: "preset-running-long",
+    name: "Long Run",
+    type: "Running" as WorkoutType,
+    description: "Weekly long run at easy pace",
+    exercises: [
+      { type: "Long Run", distance: "5 (start)", notes: "Increase distance by 1 km weekly" }
+    ]
+  },
+  {
+    id: "preset-running-intervals",
+    name: "Interval Training",
+    type: "Running" as WorkoutType,
+    description: "Speed work with intervals",
+    exercises: [
+      { type: "Interval Training", duration: "30", notes: "5 min warm-up, 5x(3 min hard/2 min easy), 5 min cool-down" }
+    ]
+  }
 ];

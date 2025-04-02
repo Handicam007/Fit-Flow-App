@@ -58,3 +58,21 @@ export const workoutEntrySchema = z.object({
 });
 
 export type WorkoutEntry = z.infer<typeof workoutEntrySchema>;
+
+// Workout preset (template)
+export const workoutPresetSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  type: z.enum(workoutTypes),
+  description: z.string().optional(),
+  exercises: z.array(
+    z.union([
+      strengthExerciseSchema,
+      mobilityExerciseSchema,
+      runningSessionSchema
+    ])
+  ).optional(),
+});
+
+export type WorkoutPreset = z.infer<typeof workoutPresetSchema>;
+

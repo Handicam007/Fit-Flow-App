@@ -9,9 +9,20 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { WorkoutType } from '@/types/workout';
 import { cn } from '@/lib/utils';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 
 const WorkoutDetail = () => {
-  const { workouts, selectedDate, updateWorkout } = useWorkout();
+  const { 
+    workouts, 
+    selectedDate,
+    workoutPresets, 
+    updateWorkout,
+    applyPresetToDate 
+  } = useWorkout();
+  
+  const [dialogOpen, setDialogOpen] = useState(false);
   
   // Find the workout for the selected date
   const selectedWorkout = workouts.find(workout => isSameDay(workout.date, selectedDate));
@@ -32,6 +43,16 @@ const WorkoutDetail = () => {
       'bg-running-light text-running': type === 'Running'
     };
   };
+
+  const handlePresetSelect = (presetId: string) => {
+    applyPresetToDate(presetId, selectedDate);
+    setDialogOpen(false);
+  };
+  
+  // Filter presets by type if a workout is already selected
+  const filteredPresets = selectedWorkout 
+    ? workoutPresets.filter(preset => preset.type === selectedWorkout.type)
+    : workoutPresets;
   
   if (!selectedWorkout) {
     return (
@@ -46,7 +67,47 @@ const WorkoutDetail = () => {
           <p>No workout planned for this day. Would you like to add one?</p>
         </CardContent>
         <CardFooter>
-          <Button variant="outline">Add Workout</Button>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">Add Workout</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Select Workout Type</DialogTitle>
+                <DialogDescription>
+                  Choose a workout preset to add to {format(selectedDate, 'EEEE, MMMM d')}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-1 gap-2">
+                  {workoutPresets.map(preset => (
+                    <Button 
+                      key={preset.id}
+                      variant="outline"
+                      className={cn(
+                        "justify-start font-normal",
+                        {
+                          'border-strength text-strength': preset.type === 'Strength',
+                          'border-mobility text-mobility': preset.type === 'Mobility',
+                          'border-running text-running': preset.type === 'Running',
+                        }
+                      )}
+                      onClick={() => handlePresetSelect(preset.id)}
+                    >
+                      <Badge className={cn("mr-2", {
+                        'bg-strength text-white': preset.type === 'Strength',
+                        'bg-mobility text-white': preset.type === 'Mobility',
+                        'bg-running text-white': preset.type === 'Running',
+                      })}>
+                        {preset.type}
+                      </Badge>
+                      {preset.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardFooter>
       </Card>
     );
@@ -68,15 +129,38 @@ const WorkoutDetail = () => {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="flex items-center space-x-2">
-          <Checkbox 
-            id="completed" 
-            checked={selectedWorkout.completed}
-            onCheckedChange={toggleCompleted}
-          />
-          <Label htmlFor="completed">
-            {selectedWorkout.completed ? "Completed" : "Mark as completed"}
-          </Label>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Checkbox 
+              id="completed" 
+              checked={selectedWorkout.completed}
+              onCheckedChange={toggleCompleted}
+            />
+            <Label htmlFor="completed">
+              {selectedWorkout.completed ? "Completed" : "Mark as completed"}
+            </Label>
+          </div>
+          
+          <div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between">
+                  Change Workout Preset
+                  <ChevronDown className="h-4 w-4 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-[200px]">
+                {filteredPresets.map(preset => (
+                  <DropdownMenuItem 
+                    key={preset.id}
+                    onClick={() => handlePresetSelect(preset.id)}
+                  >
+                    {preset.name}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
