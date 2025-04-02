@@ -137,7 +137,7 @@ export const fetchWorkoutPresets = async () => {
   }
 };
 
-// Define a simple flat type for exercise data
+// Define a simple type for exercise data
 interface ExerciseData {
   id?: string;
   exercise?: string;
