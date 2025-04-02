@@ -51,11 +51,14 @@ const WorkoutCalendar = () => {
         className="rounded-md"
         components={{
           Day: ({ date, ...props }) => {
+            // Make sure we're only using the props that exist on the div element
+            const { className, ...otherProps } = props as { className?: string };
+            
             return (
               <div
-                {...props}
+                {...otherProps}
                 className={cn(
-                  props.className,
+                  className,
                   "relative h-9 w-9 p-0 font-normal aria-selected:opacity-100",
                   getWorkoutForDate(date) && "font-semibold",
                   getWorkoutForDate(date)?.completed && "bg-muted/50"
