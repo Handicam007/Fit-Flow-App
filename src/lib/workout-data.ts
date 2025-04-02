@@ -45,6 +45,13 @@ function alternateWeeks(week: number): WorkoutType {
   return week % 2 === 0 ? "Mobility" : "Running";
 }
 
+// Create the mock data exports that are referenced in WorkoutContext
+export const mockWorkouts = generateInitialWorkouts();
+export const mockWorkoutPresets = defaultWorkoutPresets;
+export const mockStrengthExercises = defaultStrengthExercises;
+export const mockMobilityExercises = defaultMobilityExercises;
+export const mockRunningSessions = defaultRunningSessions;
+
 // Default strength training exercises
 export const defaultStrengthExercises: StrengthExercise[] = [
   // Tuesday - Full Body (Push Focus)
