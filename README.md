@@ -2,6 +2,10 @@
 
 A comprehensive workout tracking and planning application built with React, TypeScript, and Supabase. Deploy on Vercel for seamless access from any device.
 
+## Deployment Status
+
+This application is configured for deployment on Vercel with a Supabase backend.
+
 ## Features
 
 - 📅 Calendar to schedule and track workouts
