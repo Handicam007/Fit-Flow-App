@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 import * as React from "react"
 
 import type {
   ToastActionElement,
   ToastProps,
-} from "@/components/ui/toast"
+} from "./toast"
 
 const TOAST_LIMIT = 5
 const TOAST_REMOVE_DELAY = 5000
@@ -179,8 +178,3 @@ function useToast() {
 }
 
 export { useToast, toast }
-=======
-import { useToast, toast } from "@/hooks/use-toast";
-
-export { useToast, toast };
->>>>>>> origin/main

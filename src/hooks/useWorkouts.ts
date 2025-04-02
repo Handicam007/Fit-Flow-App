@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getWorkouts, addWorkout, updateWorkout, deleteWorkout } from '../lib/supabase';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '../components/ui/use-toast';
 
 export const useWorkouts = (userId: string) => {
   const [workouts, setWorkouts] = useState<any[]>([]);

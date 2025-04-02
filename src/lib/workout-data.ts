@@ -1,6 +1,6 @@
 
 import { format, addDays, startOfWeek } from "date-fns";
-import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession, WorkoutType, WorkoutPreset } from "@/types/workout";
+import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession, WorkoutType, WorkoutPreset } from "../types/workout";
 
 // Initial workout plan with 4 weeks of data
 export const generateInitialWorkouts = (): WorkoutEntry[] => {

@@ -1,6 +1,6 @@
-import { toast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import { WorkoutEntry, WorkoutPreset } from "@/types/workout";
+import { toast } from "../hooks/use-toast";
+import { supabase } from "../integrations/supabase/client";
+import { WorkoutEntry, WorkoutPreset } from "../types/workout";
 
 // Workouts
 export const fetchWorkouts = async () => {

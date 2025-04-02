@@ -1,7 +1,7 @@
 
-import { WorkoutProvider } from '@/context/WorkoutContext';
-import Header from '@/components/Header';
-import RunningLog from '@/components/RunningLog';
+import { WorkoutProvider } from '../context/WorkoutContext';
+import Header from '../components/Header';
+import RunningLog from '../components/RunningLog';
 
 const RunningPage = () => {
   return (

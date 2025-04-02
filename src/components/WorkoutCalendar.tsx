@@ -1,10 +1,10 @@
 
 import { useState } from 'react';
-import { Calendar } from '@/components/ui/calendar';
+import { Calendar } from '../components/ui/calendar';
 import { format, isSameDay } from 'date-fns';
-import { useWorkout } from '@/context/WorkoutContext';
-import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { useWorkout } from '../context/WorkoutContext';
+import { Badge } from '../components/ui/badge';
+import { cn } from '../lib/utils';
 import { DayClickEventHandler, DayContent } from 'react-day-picker';
 
 const WorkoutCalendar = () => {

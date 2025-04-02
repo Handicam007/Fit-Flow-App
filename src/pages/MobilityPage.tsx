@@ -1,7 +1,7 @@
 
-import { WorkoutProvider } from '@/context/WorkoutContext';
-import Header from '@/components/Header';
-import MobilityLog from '@/components/MobilityLog';
+import { WorkoutProvider } from '../context/WorkoutContext';
+import Header from '../components/Header';
+import MobilityLog from '../components/MobilityLog';
 
 const MobilityPage = () => {
   return (

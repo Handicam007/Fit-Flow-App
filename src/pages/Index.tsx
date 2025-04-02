@@ -1,8 +1,8 @@
 
-import { WorkoutProvider } from '@/context/WorkoutContext';
-import Header from '@/components/Header';
-import WorkoutCalendar from '@/components/WorkoutCalendar';
-import WorkoutDetail from '@/components/WorkoutDetail';
+import { WorkoutProvider } from '../context/WorkoutContext';
+import Header from '../components/Header';
+import WorkoutCalendar from '../components/WorkoutCalendar';
+import WorkoutDetail from '../components/WorkoutDetail';
 
 const Index = () => {
   return (

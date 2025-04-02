@@ -1,7 +1,7 @@
 
-import { WorkoutProvider } from '@/context/WorkoutContext';
-import Header from '@/components/Header';
-import StrengthTrainingLog from '@/components/StrengthTrainingLog';
+import { WorkoutProvider } from '../context/WorkoutContext';
+import Header from '../components/Header';
+import StrengthTrainingLog from '../components/StrengthTrainingLog';
 
 const StrengthPage = () => {
   return (

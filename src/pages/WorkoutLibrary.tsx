@@ -1,5 +1,5 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { WorkoutTemplates } from "@/components/WorkoutTemplates";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
+import { WorkoutTemplates } from "../components/WorkoutTemplates";
 import { useState } from "react";
 
 export function WorkoutLibrary() {

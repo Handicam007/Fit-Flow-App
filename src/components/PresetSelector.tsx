@@ -1,13 +1,13 @@
 
 import React from 'react';
-import { useWorkout } from '@/context/WorkoutContext';
-import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Badge } from '@/components/ui/badge';
-import { WorkoutPreset } from '@/types/workout';
+import { useWorkout } from '../context/WorkoutContext';
+import { Button } from '../components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '../components/ui/dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
+import { Badge } from '../components/ui/badge';
+import { WorkoutPreset } from '../types/workout';
 import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { cn } from '../lib/utils';
 
 interface PresetSelectorProps {
   onPresetSelected?: (presetId: string) => void;

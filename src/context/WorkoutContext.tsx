@@ -2,8 +2,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
-import { WorkoutEntry, WorkoutPreset, StrengthExercise, MobilityExercise, RunningSession } from '@/types/workout';
-import { mockWorkouts, mockWorkoutPresets, mockStrengthExercises, mockMobilityExercises, mockRunningSessions } from '@/lib/workout-data';
+import { WorkoutEntry, WorkoutPreset, StrengthExercise, MobilityExercise, RunningSession } from '../types/workout';
+import { mockWorkouts, mockWorkoutPresets, mockStrengthExercises, mockMobilityExercises, mockRunningSessions } from '../lib/workout-data';
 import { 
   fetchWorkouts, 
   createWorkout, 
@@ -11,8 +11,8 @@ import {
   deleteWorkout as deleteWorkoutService, 
   fetchWorkoutPresets,
   fetchSuggestedWorkouts
-} from '@/services/supabaseService';
-import { toast } from '@/hooks/use-toast';
+} from '../services/supabaseService';
+import { toast } from '../hooks/use-toast';
 
 interface WorkoutContextType {
   workouts: WorkoutEntry[];
