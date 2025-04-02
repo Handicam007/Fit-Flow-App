@@ -71,6 +71,7 @@ Yes it is!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+<<<<<<< HEAD
 
 # Fit Flow Calendar
 
@@ -152,3 +153,5 @@ The application includes fallback sample data and works without a Supabase conne
 ## License
 
 This project is licensed under the MIT License.
+=======
+>>>>>>> origin/main

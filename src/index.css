@@ -1,7 +1,12 @@
+<<<<<<< HEAD
+=======
+
+>>>>>>> origin/main
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+<<<<<<< HEAD
 /* Custom responsive breakpoints */
 @layer utilities {
   .container-responsive {
@@ -68,6 +73,8 @@
   }
 }
 
+=======
+>>>>>>> origin/main
 @layer base {
   :root {
     --background: 210 40% 98%;
