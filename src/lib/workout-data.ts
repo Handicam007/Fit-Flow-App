@@ -45,13 +45,6 @@ function alternateWeeks(week: number): WorkoutType {
   return week % 2 === 0 ? "Mobility" : "Running";
 }
 
-// Create the mock data exports that are referenced in WorkoutContext
-export const mockWorkouts = generateInitialWorkouts();
-export const mockWorkoutPresets = defaultWorkoutPresets;
-export const mockStrengthExercises = defaultStrengthExercises;
-export const mockMobilityExercises = defaultMobilityExercises;
-export const mockRunningSessions = defaultRunningSessions;
-
 // Default strength training exercises
 export const defaultStrengthExercises: StrengthExercise[] = [
   // Tuesday - Full Body (Push Focus)
@@ -106,7 +99,7 @@ export const defaultWorkoutPresets: WorkoutPreset[] = [
       { exercise: "Hanging Leg Raises", sets: "3", reps: "10", notes: "Engage core" },
     ]
   },
-  {
+  { 
     id: "preset-strength-pull",
     name: "Full Body (Pull Focus)",
     type: "Strength" as WorkoutType,
@@ -190,3 +183,10 @@ export const defaultWorkoutPresets: WorkoutPreset[] = [
     ]
   }
 ];
+
+// Now that all the data is defined, we can create and export the mock data
+export const mockWorkouts = generateInitialWorkouts();
+export const mockWorkoutPresets = defaultWorkoutPresets;
+export const mockStrengthExercises = defaultStrengthExercises;
+export const mockMobilityExercises = defaultMobilityExercises;
+export const mockRunningSessions = defaultRunningSessions;

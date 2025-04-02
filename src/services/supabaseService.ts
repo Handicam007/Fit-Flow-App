@@ -30,10 +30,11 @@ export const fetchWorkouts = async () => {
 
 export const createWorkout = async (workout: Omit<WorkoutEntry, 'id'>) => {
   try {
+    // Convert Date object to ISO string for the database
     const { data, error } = await supabase
       .from('workouts')
       .insert({
-        date: workout.date.toISOString().split('T')[0],
+        date: workout.date.toISOString().split('T')[0], // Convert to YYYY-MM-DD format
         title: workout.title,
         type: workout.type,
         completed: workout.completed,
@@ -45,7 +46,7 @@ export const createWorkout = async (workout: Omit<WorkoutEntry, 'id'>) => {
     
     if (error) throw error;
     
-    // Convert date string to Date object
+    // Convert date string back to Date object
     return {
       ...data,
       date: new Date(data.date),
@@ -64,9 +65,9 @@ export const createWorkout = async (workout: Omit<WorkoutEntry, 'id'>) => {
 export const updateWorkout = async (id: string, updates: Partial<WorkoutEntry>) => {
   try {
     // Prepare date if it exists in updates
-    const preparedUpdates = { ...updates };
+    const preparedUpdates: Record<string, any> = { ...updates };
     if (updates.date) {
-      preparedUpdates.date = updates.date.toISOString().split('T')[0];
+      preparedUpdates.date = updates.date.toISOString().split('T')[0]; // Convert to YYYY-MM-DD
     }
     
     const { data, error } = await supabase
@@ -78,7 +79,7 @@ export const updateWorkout = async (id: string, updates: Partial<WorkoutEntry>) 
     
     if (error) throw error;
     
-    // Convert date string to Date object
+    // Convert date string back to Date object
     return {
       ...data,
       date: new Date(data.date),
