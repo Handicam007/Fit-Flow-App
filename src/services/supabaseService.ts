@@ -1,4 +1,3 @@
-
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { WorkoutEntry, WorkoutPreset } from "@/types/workout";
@@ -137,11 +136,12 @@ export const fetchWorkoutPresets = async () => {
   }
 };
 
-// Define a simple type for exercise data to avoid deep type instantiation
-interface ExerciseData {
+// Define a specific interface for exercise data to avoid deep type instantiation
+export interface ExerciseData {
   id?: string;
-  exercise?: string;
   date?: string;
+  day?: string;
+  exercise?: string;
   type?: string;
   sets?: string;
   reps?: string;
@@ -150,7 +150,6 @@ interface ExerciseData {
   distance?: string;
   pace?: string;
   notes?: string;
-  day?: string;
 }
 
 // Workout Logs for specific types
