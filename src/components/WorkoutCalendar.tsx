@@ -5,6 +5,7 @@ import { format, isSameDay } from 'date-fns';
 import { useWorkout } from '@/context/WorkoutContext';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { DayClickEventHandler, DayContent } from 'react-day-picker';
 
 const WorkoutCalendar = () => {
   const { workouts, selectedDate, setSelectedDate } = useWorkout();
@@ -49,19 +50,19 @@ const WorkoutCalendar = () => {
         onSelect={(date) => date && setSelectedDate(date)}
         className="rounded-md"
         components={{
-          Day: ({ day, ...dayProps }) => {
+          Day: ({ date, ...props }) => {
             return (
               <div
-                {...dayProps}
+                {...props}
                 className={cn(
-                  dayProps.className,
+                  props.className,
                   "relative h-9 w-9 p-0 font-normal aria-selected:opacity-100",
-                  getWorkoutForDate(day) && "font-semibold",
-                  getWorkoutForDate(day)?.completed && "bg-muted/50"
+                  getWorkoutForDate(date) && "font-semibold",
+                  getWorkoutForDate(date)?.completed && "bg-muted/50"
                 )}
               >
                 <div className="flex h-full w-full flex-col items-center justify-center">
-                  {renderDay(day)}
+                  {renderDay(date)}
                 </div>
               </div>
             );
