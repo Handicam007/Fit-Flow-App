@@ -147,7 +147,7 @@ export const fetchStrengthExercises = async () => {
     
     if (error) throw error;
     
-    return data;
+    return data || [];
   } catch (error) {
     console.error('Error fetching strength exercises:', error);
     toast({
@@ -168,7 +168,7 @@ export const fetchMobilityExercises = async () => {
     
     if (error) throw error;
     
-    return data;
+    return data || [];
   } catch (error) {
     console.error('Error fetching mobility exercises:', error);
     toast({
@@ -189,7 +189,7 @@ export const fetchRunningSessions = async () => {
     
     if (error) throw error;
     
-    return data;
+    return data || [];
   } catch (error) {
     console.error('Error fetching running sessions:', error);
     toast({
