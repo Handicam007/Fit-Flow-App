@@ -4,11 +4,19 @@ import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
 import { WorkoutEntry, WorkoutPreset, StrengthExercise, MobilityExercise, RunningSession } from '@/types/workout';
 import { mockWorkouts, mockWorkoutPresets, mockStrengthExercises, mockMobilityExercises, mockRunningSessions } from '@/lib/workout-data';
-import { fetchWorkouts, createWorkout, updateWorkout, deleteWorkout, fetchWorkoutPresets } from '@/services/supabaseService';
+import { 
+  fetchWorkouts, 
+  createWorkout, 
+  updateWorkout as updateWorkoutService, 
+  deleteWorkout as deleteWorkoutService, 
+  fetchWorkoutPresets,
+  fetchSuggestedWorkouts
+} from '@/services/supabaseService';
 import { toast } from '@/hooks/use-toast';
 
 interface WorkoutContextType {
   workouts: WorkoutEntry[];
+  suggestedWorkouts: (WorkoutEntry & { isSuggested: boolean })[];
   workoutPresets: WorkoutPreset[];
   selectedDate: Date;
   strengthExercises: StrengthExercise[];
@@ -22,12 +30,14 @@ interface WorkoutContextType {
   updateMobilityExercise: (index: number, updates: Partial<MobilityExercise>) => void;
   updateRunningSession: (index: number, updates: Partial<RunningSession>) => void;
   applyPresetToDate: (presetId: string, date: Date) => void;
+  convertSuggestedToActual: (id: string, updates?: Partial<WorkoutEntry>) => void;
 }
 
 const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
 
 export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [workouts, setWorkouts] = useState<WorkoutEntry[]>([]);
+  const [suggestedWorkouts, setSuggestedWorkouts] = useState<(WorkoutEntry & { isSuggested: boolean })[]>([]);
   const [workoutPresets, setWorkoutPresets] = useState<WorkoutPreset[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [strengthExercises, setStrengthExercises] = useState<StrengthExercise[]>(mockStrengthExercises);
@@ -40,13 +50,15 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const loadData = async () => {
       try {
         setLoading(true);
-        const [workoutsData, presetsData] = await Promise.all([
+        const [workoutsData, presetsData, suggestedData] = await Promise.all([
           fetchWorkouts(),
-          fetchWorkoutPresets()
+          fetchWorkoutPresets(),
+          fetchSuggestedWorkouts()
         ]);
         
         setWorkouts(workoutsData);
         setWorkoutPresets(presetsData);
+        setSuggestedWorkouts(suggestedData);
       } catch (error) {
         console.error("Error loading workout data:", error);
         toast({
@@ -58,6 +70,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
         // Fallback to mock data if API fails
         setWorkouts(mockWorkouts);
         setWorkoutPresets(mockWorkoutPresets);
+        setSuggestedWorkouts([]);
       } finally {
         setLoading(false);
       }
@@ -89,7 +102,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const handleUpdateWorkout = async (id: string, updates: Partial<WorkoutEntry>) => {
     try {
-      const updatedWorkout = await updateWorkout(id, updates);
+      const updatedWorkout = await updateWorkoutService(id, updates);
       if (updatedWorkout) {
         setWorkouts(prevWorkouts => 
           prevWorkouts.map(workout => workout.id === id ? {...workout, ...updates} : workout)
@@ -117,7 +130,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const handleDeleteWorkout = async (id: string) => {
     try {
-      const success = await deleteWorkout(id);
+      const success = await deleteWorkoutService(id);
       if (success) {
         setWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout.id !== id));
         toast({
@@ -169,9 +182,41 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
     addWorkout(newWorkout);
   };
 
+  const convertSuggestedToActual = async (id: string, updates?: Partial<WorkoutEntry>) => {
+    const suggestedWorkout = suggestedWorkouts.find(workout => workout.id === id);
+    if (!suggestedWorkout) return;
+    
+    try {
+      // Apply updates and remove suggestion flag when converting
+      const { isSuggested, ...workoutData } = suggestedWorkout;
+      const updatedData = { ...workoutData, ...updates, isSuggested: false };
+      
+      const newWorkout = await createWorkout(updatedData);
+      
+      if (newWorkout) {
+        // Remove from suggestions and add to regular workouts
+        setSuggestedWorkouts(prev => prev.filter(w => w.id !== id));
+        setWorkouts(prev => [...prev, newWorkout]);
+        
+        toast({
+          title: "Workout confirmed",
+          description: `Suggested workout has been added to your schedule`,
+        });
+      }
+    } catch (error) {
+      console.error("Error converting suggested workout:", error);
+      toast({
+        title: "Error",
+        description: "Failed to convert suggested workout",
+        variant: "destructive"
+      });
+    }
+  };
+
   return (
     <WorkoutContext.Provider value={{
       workouts,
+      suggestedWorkouts,
       workoutPresets,
       selectedDate,
       strengthExercises,
@@ -185,6 +230,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
       updateMobilityExercise,
       updateRunningSession,
       applyPresetToDate,
+      convertSuggestedToActual,
     }}>
       {children}
     </WorkoutContext.Provider>

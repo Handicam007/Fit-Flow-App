@@ -11,21 +11,33 @@ import { WorkoutType } from '@/types/workout';
 import { cn } from '@/lib/utils';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { ChevronDown } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { ChevronDown, Edit, Save } from 'lucide-react';
 
 const WorkoutDetail = () => {
   const { 
     workouts, 
+    suggestedWorkouts,
     selectedDate,
     workoutPresets, 
     updateWorkout,
-    applyPresetToDate 
+    applyPresetToDate,
+    convertSuggestedToActual
   } = useWorkout();
   
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editTitle, setEditTitle] = useState('');
+  const [editNote, setEditNote] = useState('');
   
-  // Find the workout for the selected date
-  const selectedWorkout = workouts.find(workout => isSameDay(workout.date, selectedDate));
+  // Find workout for the selected date, prioritizing actual workouts over suggested ones
+  const actualWorkout = workouts.find(workout => isSameDay(workout.date, selectedDate));
+  const suggestedWorkout = suggestedWorkouts.find(workout => isSameDay(workout.date, selectedDate));
+  
+  // Use actual workout if available, otherwise use suggested
+  const selectedWorkout = actualWorkout || suggestedWorkout;
+  const isSuggested = !actualWorkout && !!suggestedWorkout;
   
   // Toggle completion status
   const toggleCompleted = () => {
@@ -33,6 +45,31 @@ const WorkoutDetail = () => {
       updateWorkout(selectedWorkout.id, { 
         completed: !selectedWorkout.completed 
       });
+    }
+  };
+  
+  const handleSaveEdit = () => {
+    if (selectedWorkout) {
+      if (isSuggested && convertSuggestedToActual) {
+        convertSuggestedToActual(selectedWorkout.id, {
+          title: editTitle,
+          note: editNote
+        });
+      } else {
+        updateWorkout(selectedWorkout.id, {
+          title: editTitle,
+          note: editNote
+        });
+      }
+      setIsEditing(false);
+    }
+  };
+  
+  const handleStartEdit = () => {
+    if (selectedWorkout) {
+      setEditTitle(selectedWorkout.title);
+      setEditNote(selectedWorkout.note || '');
+      setIsEditing(true);
     }
   };
   
@@ -114,11 +151,24 @@ const WorkoutDetail = () => {
   }
   
   return (
-    <Card className="w-full">
+    <Card className={cn("w-full", isSuggested && "border-dashed")}>
       <CardHeader>
         <div className="flex justify-between items-center">
-          <div>
-            <CardTitle>{selectedWorkout.title}</CardTitle>
+          <div className="flex-1">
+            {isEditing ? (
+              <Input 
+                value={editTitle} 
+                onChange={(e) => setEditTitle(e.target.value)} 
+                className="text-xl font-bold mb-1"
+              />
+            ) : (
+              <CardTitle className="flex items-center">
+                {selectedWorkout.title}
+                {isSuggested && (
+                  <Badge variant="outline" className="ml-2 text-xs">Suggested</Badge>
+                )}
+              </CardTitle>
+            )}
             <CardDescription>
               {format(selectedWorkout.date, 'EEEE, MMMM d, yyyy')}
             </CardDescription>
@@ -130,55 +180,97 @@ const WorkoutDetail = () => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="completed" 
-              checked={selectedWorkout.completed}
-              onCheckedChange={toggleCompleted}
-            />
-            <Label htmlFor="completed">
-              {selectedWorkout.completed ? "Completed" : "Mark as completed"}
-            </Label>
-          </div>
+          {!isEditing ? (
+            <>
+              <div className="flex items-center space-x-2">
+                <Checkbox 
+                  id="completed" 
+                  checked={selectedWorkout.completed}
+                  onCheckedChange={toggleCompleted}
+                />
+                <Label htmlFor="completed">
+                  {selectedWorkout.completed ? "Completed" : "Mark as completed"}
+                </Label>
+              </div>
+              
+              {selectedWorkout.note && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-medium mb-1">Notes:</h4>
+                  <p className="text-sm text-muted-foreground">{selectedWorkout.note}</p>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="space-y-2">
+              <Label htmlFor="note">Notes</Label>
+              <Textarea 
+                id="note" 
+                value={editNote} 
+                onChange={(e) => setEditNote(e.target.value)}
+                rows={3}
+              />
+            </div>
+          )}
           
-          <div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between">
-                  Change Workout Preset
-                  <ChevronDown className="h-4 w-4 opacity-50" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-[200px]">
-                {filteredPresets.map(preset => (
-                  <DropdownMenuItem 
-                    key={preset.id}
-                    onClick={() => handlePresetSelect(preset.id)}
-                  >
-                    {preset.name}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+          {!isEditing && (
+            <div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" className="w-full justify-between">
+                    Change Workout Preset
+                    <ChevronDown className="h-4 w-4 opacity-50" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[200px]">
+                  {filteredPresets.map(preset => (
+                    <DropdownMenuItem 
+                      key={preset.id}
+                      onClick={() => handlePresetSelect(preset.id)}
+                    >
+                      {preset.name}
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-between">
-        <Button 
-          variant="outline"
-        >
-          View Details
-        </Button>
-        <Button 
-          variant={selectedWorkout.type === 'Strength' ? 'default' : 'outline'}
-          className={cn({
-            'bg-strength border-strength hover:bg-strength/90': selectedWorkout.type === 'Strength',
-            'bg-mobility border-mobility hover:bg-mobility/90 text-white': selectedWorkout.type === 'Mobility',
-            'bg-running border-running hover:bg-running/90 text-white': selectedWorkout.type === 'Running',
-          })}
-        >
-          Log {selectedWorkout.type} Workout
-        </Button>
+        {isEditing ? (
+          <Button 
+            variant="outline"
+            onClick={() => setIsEditing(false)}
+          >
+            Cancel
+          </Button>
+        ) : (
+          <Button 
+            variant="outline"
+            onClick={handleStartEdit}
+          >
+            <Edit className="h-4 w-4 mr-2" />
+            Edit
+          </Button>
+        )}
+        
+        {isEditing ? (
+          <Button onClick={handleSaveEdit}>
+            <Save className="h-4 w-4 mr-2" />
+            Save
+          </Button>
+        ) : (
+          <Button 
+            variant={selectedWorkout.type === 'Strength' ? 'default' : 'outline'}
+            className={cn({
+              'bg-strength border-strength hover:bg-strength/90': selectedWorkout.type === 'Strength',
+              'bg-mobility border-mobility hover:bg-mobility/90 text-white': selectedWorkout.type === 'Mobility',
+              'bg-running border-running hover:bg-running/90 text-white': selectedWorkout.type === 'Running',
+            })}
+          >
+            Log {selectedWorkout.type} Workout
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

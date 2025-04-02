@@ -137,7 +137,7 @@ export const fetchWorkoutPresets = async () => {
   }
 };
 
-// Define a simple type for exercise data
+// Define a simple type for exercise data to avoid deep type instantiation
 interface ExerciseData {
   id?: string;
   exercise?: string;
@@ -210,6 +210,33 @@ export const fetchRunningSessions = async (): Promise<ExerciseData[]> => {
     console.error('Error fetching running sessions:', error);
     toast({
       title: "Error fetching running sessions",
+      description: error.message,
+      variant: "destructive",
+    });
+    return [];
+  }
+};
+
+// Suggested Workouts
+export const fetchSuggestedWorkouts = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('workouts')
+      .select('*')
+      .eq('completed', false);
+    
+    if (error) throw error;
+    
+    // Convert date strings to Date objects
+    return data.map(workout => ({
+      ...workout,
+      date: new Date(workout.date),
+      isSuggested: true
+    })) as (WorkoutEntry & { isSuggested: boolean })[];
+  } catch (error) {
+    console.error('Error fetching suggested workouts:', error);
+    toast({
+      title: "Error fetching suggested workouts",
       description: error.message,
       variant: "destructive",
     });
