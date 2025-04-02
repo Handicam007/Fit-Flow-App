@@ -1,40 +1,26 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { WorkoutEntry, StrengthExercise, MobilityExercise, RunningSession, WorkoutPreset } from '@/types/workout';
-import { 
-  generateInitialWorkouts, 
-  defaultStrengthExercises, 
-  defaultMobilityExercises,
-  defaultRunningSessions,
-  defaultWorkoutPresets
-} from '@/lib/workout-data';
+import { v4 as uuidv4 } from 'uuid';
 import { format } from 'date-fns';
+import { WorkoutEntry, WorkoutPreset, StrengthExercise, MobilityExercise, RunningSession } from '@/types/workout';
+import { mockWorkouts, mockWorkoutPresets, mockStrengthExercises, mockMobilityExercises, mockRunningSessions } from '@/lib/workout-data';
+import { fetchWorkouts, createWorkout, updateWorkout, deleteWorkout, fetchWorkoutPresets } from '@/services/supabaseService';
+import { toast } from '@/hooks/use-toast';
 
 interface WorkoutContextType {
   workouts: WorkoutEntry[];
+  workoutPresets: WorkoutPreset[];
   selectedDate: Date;
   strengthExercises: StrengthExercise[];
   mobilityExercises: MobilityExercise[];
   runningSessions: RunningSession[];
-  workoutPresets: WorkoutPreset[];
-  
   setSelectedDate: (date: Date) => void;
-  addWorkout: (workout: WorkoutEntry) => void;
-  updateWorkout: (id: string, workout: Partial<WorkoutEntry>) => void;
+  addWorkout: (workout: Omit<WorkoutEntry, 'id'>) => void;
+  updateWorkout: (id: string, updates: Partial<WorkoutEntry>) => void;
   deleteWorkout: (id: string) => void;
-  
-  addStrengthExercise: (exercise: StrengthExercise) => void;
-  updateStrengthExercise: (index: number, exercise: Partial<StrengthExercise>) => void;
-  
-  addMobilityExercise: (exercise: MobilityExercise) => void;
-  updateMobilityExercise: (index: number, exercise: Partial<MobilityExercise>) => void;
-  
-  addRunningSession: (session: RunningSession) => void;
-  updateRunningSession: (index: number, session: Partial<RunningSession>) => void;
-  
-  addWorkoutPreset: (preset: WorkoutPreset) => void;
-  updateWorkoutPreset: (id: string, preset: Partial<WorkoutPreset>) => void;
-  deleteWorkoutPreset: (id: string) => void;
+  updateStrengthExercise: (index: number, updates: Partial<StrengthExercise>) => void;
+  updateMobilityExercise: (index: number, updates: Partial<MobilityExercise>) => void;
+  updateRunningSession: (index: number, updates: Partial<RunningSession>) => void;
   applyPresetToDate: (presetId: string, date: Date) => void;
 }
 
@@ -42,128 +28,162 @@ const WorkoutContext = createContext<WorkoutContextType | undefined>(undefined);
 
 export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [workouts, setWorkouts] = useState<WorkoutEntry[]>([]);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-  const [strengthExercises, setStrengthExercises] = useState<StrengthExercise[]>([]);
-  const [mobilityExercises, setMobilityExercises] = useState<MobilityExercise[]>([]);
-  const [runningSessions, setRunningSessions] = useState<RunningSession[]>([]);
   const [workoutPresets, setWorkoutPresets] = useState<WorkoutPreset[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [strengthExercises, setStrengthExercises] = useState<StrengthExercise[]>(mockStrengthExercises);
+  const [mobilityExercises, setMobilityExercises] = useState<MobilityExercise[]>(mockMobilityExercises);
+  const [runningSessions, setRunningSessions] = useState<RunningSession[]>(mockRunningSessions);
+  const [loading, setLoading] = useState(true);
 
-  // Initialize with default data
+  // Load workouts and presets from Supabase
   useEffect(() => {
-    setWorkouts(generateInitialWorkouts());
-    setStrengthExercises(defaultStrengthExercises);
-    setMobilityExercises(defaultMobilityExercises);
-    setRunningSessions(defaultRunningSessions);
-    setWorkoutPresets(defaultWorkoutPresets);
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        const [workoutsData, presetsData] = await Promise.all([
+          fetchWorkouts(),
+          fetchWorkoutPresets()
+        ]);
+        
+        setWorkouts(workoutsData);
+        setWorkoutPresets(presetsData);
+      } catch (error) {
+        console.error("Error loading workout data:", error);
+        toast({
+          title: "Error loading data",
+          description: "Could not load your workout data. Using sample data instead.",
+          variant: "destructive"
+        });
+        
+        // Fallback to mock data if API fails
+        setWorkouts(mockWorkouts);
+        setWorkoutPresets(mockWorkoutPresets);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
   }, []);
 
-  const addWorkout = (workout: WorkoutEntry) => {
-    setWorkouts([...workouts, workout]);
+  const addWorkout = async (workout: Omit<WorkoutEntry, 'id'>) => {
+    try {
+      const newWorkout = await createWorkout(workout);
+      if (newWorkout) {
+        setWorkouts(prevWorkouts => [...prevWorkouts, newWorkout]);
+        toast({
+          title: "Workout added",
+          description: `${workout.title} added to ${format(workout.date, 'MMM d, yyyy')}`,
+        });
+      }
+    } catch (error) {
+      console.error("Error adding workout:", error);
+      // Fallback to local state if API fails
+      const newWorkout: WorkoutEntry = {
+        id: uuidv4(),
+        ...workout
+      };
+      setWorkouts(prev => [...prev, newWorkout]);
+    }
   };
 
-  const updateWorkout = (id: string, updatedWorkout: Partial<WorkoutEntry>) => {
-    setWorkouts(workouts.map(workout => 
-      workout.id === id ? { ...workout, ...updatedWorkout } : workout
-    ));
+  const handleUpdateWorkout = async (id: string, updates: Partial<WorkoutEntry>) => {
+    try {
+      const updatedWorkout = await updateWorkout(id, updates);
+      if (updatedWorkout) {
+        setWorkouts(prevWorkouts => 
+          prevWorkouts.map(workout => workout.id === id ? {...workout, ...updates} : workout)
+        );
+        if (updates.completed !== undefined) {
+          toast({
+            title: updates.completed ? "Workout completed" : "Workout marked incomplete",
+            description: `Your workout has been updated`,
+          });
+        } else {
+          toast({
+            title: "Workout updated",
+            description: `Your workout details have been updated`,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating workout:", error);
+      // Fallback to local state if API fails
+      setWorkouts(prevWorkouts => 
+        prevWorkouts.map(workout => workout.id === id ? {...workout, ...updates} : workout)
+      );
+    }
   };
 
-  const deleteWorkout = (id: string) => {
-    setWorkouts(workouts.filter(workout => workout.id !== id));
+  const handleDeleteWorkout = async (id: string) => {
+    try {
+      const success = await deleteWorkout(id);
+      if (success) {
+        setWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout.id !== id));
+        toast({
+          title: "Workout deleted",
+          description: "Your workout has been removed",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting workout:", error);
+      // Fallback to local state if API fails
+      setWorkouts(prevWorkouts => prevWorkouts.filter(workout => workout.id !== id));
+    }
   };
 
-  const addStrengthExercise = (exercise: StrengthExercise) => {
-    setStrengthExercises([...strengthExercises, exercise]);
+  // For exercise logs (still using mock data until we implement workout logs table functionality)
+  const updateStrengthExercise = (index: number, updates: Partial<StrengthExercise>) => {
+    setStrengthExercises(prev => 
+      prev.map((exercise, i) => i === index ? {...exercise, ...updates} : exercise)
+    );
   };
 
-  const updateStrengthExercise = (index: number, updatedExercise: Partial<StrengthExercise>) => {
-    const newExercises = [...strengthExercises];
-    newExercises[index] = { ...newExercises[index], ...updatedExercise };
-    setStrengthExercises(newExercises);
+  const updateMobilityExercise = (index: number, updates: Partial<MobilityExercise>) => {
+    setMobilityExercises(prev => 
+      prev.map((exercise, i) => i === index ? {...exercise, ...updates} : exercise)
+    );
   };
 
-  const addMobilityExercise = (exercise: MobilityExercise) => {
-    setMobilityExercises([...mobilityExercises, exercise]);
+  const updateRunningSession = (index: number, updates: Partial<RunningSession>) => {
+    setRunningSessions(prev => 
+      prev.map((session, i) => i === index ? {...session, ...updates} : session)
+    );
   };
 
-  const updateMobilityExercise = (index: number, updatedExercise: Partial<MobilityExercise>) => {
-    const newExercises = [...mobilityExercises];
-    newExercises[index] = { ...newExercises[index], ...updatedExercise };
-    setMobilityExercises(newExercises);
-  };
-
-  const addRunningSession = (session: RunningSession) => {
-    setRunningSessions([...runningSessions, session]);
-  };
-
-  const updateRunningSession = (index: number, updatedSession: Partial<RunningSession>) => {
-    const newSessions = [...runningSessions];
-    newSessions[index] = { ...newSessions[index], ...updatedSession };
-    setRunningSessions(newSessions);
-  };
-
-  // New functions for workout presets
-  const addWorkoutPreset = (preset: WorkoutPreset) => {
-    setWorkoutPresets([...workoutPresets, preset]);
-  };
-
-  const updateWorkoutPreset = (id: string, updatedPreset: Partial<WorkoutPreset>) => {
-    setWorkoutPresets(workoutPresets.map(preset => 
-      preset.id === id ? { ...preset, ...updatedPreset } : preset
-    ));
-  };
-
-  const deleteWorkoutPreset = (id: string) => {
-    setWorkoutPresets(workoutPresets.filter(preset => preset.id !== id));
-  };
-
-  // Apply a preset to a specific date in the calendar
   const applyPresetToDate = (presetId: string, date: Date) => {
     const preset = workoutPresets.find(p => p.id === presetId);
     if (!preset) return;
-
-    const formattedDate = format(date, 'yyyy-MM-dd');
-    const existingWorkout = workouts.find(w => format(w.date, 'yyyy-MM-dd') === formattedDate);
-
-    if (existingWorkout) {
-      // Update existing workout
-      updateWorkout(existingWorkout.id, {
-        title: preset.name,
-        type: preset.type,
-      });
-    } else {
-      // Create new workout
-      addWorkout({
-        id: `workout-${formattedDate}`,
-        date,
-        day: format(date, 'EEEE'),
-        title: preset.name,
-        type: preset.type,
-        completed: false,
-      });
-    }
+    
+    const day = format(date, 'EEEE');
+    
+    const newWorkout: Omit<WorkoutEntry, 'id'> = {
+      date,
+      day,
+      title: preset.name,
+      type: preset.type,
+      completed: false,
+      note: preset.description,
+    };
+    
+    addWorkout(newWorkout);
   };
 
   return (
     <WorkoutContext.Provider value={{
       workouts,
+      workoutPresets,
       selectedDate,
       strengthExercises,
       mobilityExercises,
       runningSessions,
-      workoutPresets,
       setSelectedDate,
       addWorkout,
-      updateWorkout,
-      deleteWorkout,
-      addStrengthExercise,
+      updateWorkout: handleUpdateWorkout,
+      deleteWorkout: handleDeleteWorkout,
       updateStrengthExercise,
-      addMobilityExercise,
       updateMobilityExercise,
-      addRunningSession,
       updateRunningSession,
-      addWorkoutPreset,
-      updateWorkoutPreset,
-      deleteWorkoutPreset,
       applyPresetToDate,
     }}>
       {children}
@@ -173,7 +193,7 @@ export const WorkoutProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
 export const useWorkout = () => {
   const context = useContext(WorkoutContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useWorkout must be used within a WorkoutProvider');
   }
   return context;

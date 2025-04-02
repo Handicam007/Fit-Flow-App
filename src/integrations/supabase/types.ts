@@ -9,7 +9,116 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      workout_logs: {
+        Row: {
+          completed_exercises: Json | null
+          created_at: string | null
+          date: string
+          id: string
+          notes: string | null
+          updated_at: string | null
+          user_id: string | null
+          workout_id: string | null
+        }
+        Insert: {
+          completed_exercises?: Json | null
+          created_at?: string | null
+          date: string
+          id?: string
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          workout_id?: string | null
+        }
+        Update: {
+          completed_exercises?: Json | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          workout_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workout_logs_workout_id_fkey"
+            columns: ["workout_id"]
+            isOneToOne: false
+            referencedRelation: "workouts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workout_presets: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          exercises: Json | null
+          id: string
+          name: string
+          type: Database["public"]["Enums"]["workout_type"]
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          exercises?: Json | null
+          id?: string
+          name: string
+          type: Database["public"]["Enums"]["workout_type"]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          exercises?: Json | null
+          id?: string
+          name?: string
+          type?: Database["public"]["Enums"]["workout_type"]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      workouts: {
+        Row: {
+          completed: boolean | null
+          created_at: string | null
+          date: string
+          id: string
+          note: string | null
+          title: string
+          type: Database["public"]["Enums"]["workout_type"]
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed?: boolean | null
+          created_at?: string | null
+          date: string
+          id?: string
+          note?: string | null
+          title: string
+          type: Database["public"]["Enums"]["workout_type"]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed?: boolean | null
+          created_at?: string | null
+          date?: string
+          id?: string
+          note?: string | null
+          title?: string
+          type?: Database["public"]["Enums"]["workout_type"]
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +127,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      workout_type: "Strength" | "Mobility" | "Running"
     }
     CompositeTypes: {
       [_ in never]: never
