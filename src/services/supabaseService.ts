@@ -137,8 +137,25 @@ export const fetchWorkoutPresets = async () => {
   }
 };
 
+// Define explicit type for exercise data to avoid type recursion issues
+type ExerciseData = {
+  id?: string;
+  exercise?: string;
+  date?: string;
+  type?: string;
+  sets?: string;
+  reps?: string;
+  weight?: string;
+  duration?: string;
+  distance?: string;
+  pace?: string;
+  notes?: string;
+  day?: string;
+  [key: string]: any;
+};
+
 // Workout Logs for specific types
-export const fetchStrengthExercises = async () => {
+export const fetchStrengthExercises = async (): Promise<ExerciseData[]> => {
   try {
     const { data, error } = await supabase
       .from('workout_logs')
@@ -147,8 +164,7 @@ export const fetchStrengthExercises = async () => {
     
     if (error) throw error;
     
-    // Explicitly return an array with a more specific type
-    return (data || []) as Array<Record<string, any>>;
+    return data || [];
   } catch (error) {
     console.error('Error fetching strength exercises:', error);
     toast({
@@ -160,7 +176,7 @@ export const fetchStrengthExercises = async () => {
   }
 };
 
-export const fetchMobilityExercises = async () => {
+export const fetchMobilityExercises = async (): Promise<ExerciseData[]> => {
   try {
     const { data, error } = await supabase
       .from('workout_logs')
@@ -169,8 +185,7 @@ export const fetchMobilityExercises = async () => {
     
     if (error) throw error;
     
-    // Explicitly return an array with a more specific type
-    return (data || []) as Array<Record<string, any>>;
+    return data || [];
   } catch (error) {
     console.error('Error fetching mobility exercises:', error);
     toast({
@@ -182,7 +197,7 @@ export const fetchMobilityExercises = async () => {
   }
 };
 
-export const fetchRunningSessions = async () => {
+export const fetchRunningSessions = async (): Promise<ExerciseData[]> => {
   try {
     const { data, error } = await supabase
       .from('workout_logs')
@@ -191,8 +206,7 @@ export const fetchRunningSessions = async () => {
     
     if (error) throw error;
     
-    // Explicitly return an array with a more specific type
-    return (data || []) as Array<Record<string, any>>;
+    return data || [];
   } catch (error) {
     console.error('Error fetching running sessions:', error);
     toast({
