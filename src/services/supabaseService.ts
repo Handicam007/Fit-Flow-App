@@ -137,8 +137,8 @@ export const fetchWorkoutPresets = async () => {
   }
 };
 
-// Define explicit type for exercise data to avoid type recursion issues
-type ExerciseData = {
+// Define a simple flat type for exercise data
+interface ExerciseData {
   id?: string;
   exercise?: string;
   date?: string;
@@ -151,8 +151,7 @@ type ExerciseData = {
   pace?: string;
   notes?: string;
   day?: string;
-  [key: string]: any;
-};
+}
 
 // Workout Logs for specific types
 export const fetchStrengthExercises = async (): Promise<ExerciseData[]> => {
@@ -164,7 +163,7 @@ export const fetchStrengthExercises = async (): Promise<ExerciseData[]> => {
     
     if (error) throw error;
     
-    return data || [];
+    return (data || []) as ExerciseData[];
   } catch (error) {
     console.error('Error fetching strength exercises:', error);
     toast({
@@ -185,7 +184,7 @@ export const fetchMobilityExercises = async (): Promise<ExerciseData[]> => {
     
     if (error) throw error;
     
-    return data || [];
+    return (data || []) as ExerciseData[];
   } catch (error) {
     console.error('Error fetching mobility exercises:', error);
     toast({
@@ -206,7 +205,7 @@ export const fetchRunningSessions = async (): Promise<ExerciseData[]> => {
     
     if (error) throw error;
     
-    return data || [];
+    return (data || []) as ExerciseData[];
   } catch (error) {
     console.error('Error fetching running sessions:', error);
     toast({
